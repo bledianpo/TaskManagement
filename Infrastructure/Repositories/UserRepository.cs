@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Infrastructure.Data;
 using Task = System.Threading.Tasks.Task;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +17,9 @@ namespace Infrastructure.Repositories
 
         public async Task<User?> GetByEmailAsync(string email)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (string.IsNullOrWhiteSpace(email)) return null;
+            var normalized = email.Trim().ToLowerInvariant();
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == normalized);
         }
 
         public async Task AddAsync(User user)
