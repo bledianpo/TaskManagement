@@ -1,10 +1,16 @@
+using Application;
 using Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException("DefaultConnection is not configured in appsettings.json");
+}
 
 // Add services to the container.
-object value = builder.Services.AddInfrastructure(connectionString);
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(connectionString);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

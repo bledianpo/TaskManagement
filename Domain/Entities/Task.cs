@@ -8,7 +8,7 @@ namespace Domain.Entities
         public int Id { get; set; }
         public string Title { get; private set; } = null!;
         public string Description { get; private set; } = null!;
-        public Enums.TaskStatus Status { get; private set; } = Enums.TaskStatus.Draft;
+        public TaskStatus Status { get; private set; } = TaskStatus.Draft;
         public TaskPriority Priority { get; private set; } = TaskPriority.Medium;
         public int UserId { get; private set; }
         public User User { get; private set; } = null!;
@@ -19,6 +19,14 @@ namespace Domain.Entities
             UserId = userId;
             Priority = priority;
             Status = status;
+        }
+
+        public void Update(string title, string description, TaskStatus status, TaskPriority priority)
+        {
+            Title = title;
+            Description = description;
+            Status = status;
+            Priority = priority;
         }
     }
 }
