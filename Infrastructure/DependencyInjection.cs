@@ -14,6 +14,8 @@ namespace Infrastructure
                 options.UseSqlServer(connectionString); 
             });
             services.AddScoped<ITaskRepository, TaskRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+
             return services;
         }
     }
