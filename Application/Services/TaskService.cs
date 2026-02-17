@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.DTO;
+using Application.Interfaces;
 using TaskEntity = Domain.Entities.Task;
 
 namespace Application.Services
@@ -12,7 +13,7 @@ namespace Application.Services
             _taskRepository = taskRepository;
         }
 
-        public async Task<TaskEntity?> CreateTaskAsync(TaskEntity task)
+        public async Task<TaskEntity?> CreateTaskAsync(CreateTaskRequest task)
         {
             var createTask = new TaskEntity(task.Title, task.Description, task.UserId, task.Priority, task.Status);
             await _taskRepository.AddAsync(createTask);
@@ -35,7 +36,7 @@ namespace Application.Services
             return task;
         }
 
-        public async Task<TaskEntity?> UpdateTaskAsync(int id, TaskEntity updatedTask)
+        public async Task<TaskEntity?> UpdateTaskAsync(int id, UpdateTaskRequest updatedTask)
         {
             if (updatedTask == null)
             {
@@ -51,7 +52,6 @@ namespace Application.Services
             task.Update(updatedTask.Title, updatedTask.Description, updatedTask.Status, updatedTask.Priority);
             await _taskRepository.UpdateAsync(task);
             return task;
-
         }
 
         public async Task<bool> DeleteTaskAsync(int id)

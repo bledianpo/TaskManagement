@@ -21,12 +21,12 @@ namespace Domain.Entities
             Status = status;
         }
 
-        public void Update(string title, string description, TaskStatus status, TaskPriority priority)
+        public void Update(string? title, string? description, TaskStatus? status, TaskPriority? priority)
         {
-            Title = title;
-            Description = description;
-            Status = status;
-            Priority = priority;
+            if (!string.IsNullOrWhiteSpace(title)) Title = title;
+            if (!string.IsNullOrWhiteSpace(description)) Description = description;
+            if (status.HasValue) Status = status.Value;
+            if (priority.HasValue) Priority = priority.Value;
         }
     }
 }
