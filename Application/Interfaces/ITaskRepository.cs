@@ -6,8 +6,8 @@ namespace Application.Interfaces
     {
         Task AddAsync(TaskEntity task);
         Task<TaskEntity?> GetByIdAsync(int id);
-        Task<List<TaskEntity>> GetAllAsync();
-        Task<List<TaskEntity>> GetByUserIdAsync(int userId);
+        Task<List<TaskEntity>> GetAllAsync(int pageNumber, int pageSize);
+        Task<List<TaskEntity>> GetByUserIdAsync(int userId, int pageNumber, int pageSize);
         Task UpdateAsync(TaskEntity task);
         Task DeleteAsync(TaskEntity task);
     }

@@ -1,4 +1,5 @@
 ﻿using Domain.Enums;
+using TaskStatus = Domain.Enums.TaskStatus;
 
 namespace Domain.Entities
 {
@@ -11,13 +12,13 @@ namespace Domain.Entities
         public TaskPriority Priority { get; private set; } = TaskPriority.Medium;
         public int UserId { get; private set; }
         public User User { get; private set; } = null!;
-        public Task(string title, string description, int userId, TaskPriority priority = TaskPriority.Medium)
+        public Task(string title, string description, int userId, TaskPriority priority = TaskPriority.Medium, TaskStatus status = TaskStatus.Draft)
         {
             Title = title;
             Description = description;
             UserId = userId;
             Priority = priority;
-            Status = Enums.TaskStatus.Draft;
+            Status = status;
         }
     }
 }
