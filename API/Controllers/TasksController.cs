@@ -10,6 +10,8 @@ namespace API.Controllers
     public class TasksController : ControllerBase
     {
         private readonly ITaskService _taskService;
+        private const int DefaultPageSize = 10;
+        private const int MaxPageSize = 100;
 
         public TasksController(ITaskService taskService)
         {
@@ -17,8 +19,16 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(int pageNumber, int pageSize)
+        public async Task<IActionResult> GetAll(int pageNumber = 1, int pageSize = DefaultPageSize)
         {
+            if (pageNumber < 1)
+            {
+                pageNumber = 1;
+            }
+            if (pageSize < 1 || pageSize > MaxPageSize)
+            {
+                pageSize = DefaultPageSize;
+            }
             var tasks = await _taskService.GetAllTasksAsync(pageNumber, pageSize);
             return Ok(tasks);
         }

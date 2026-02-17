@@ -20,13 +20,5 @@ namespace Domain.Entities
             Priority = priority;
             Status = status;
         }
-
-        public void Update(string? title, string? description, TaskStatus? status, TaskPriority? priority)
-        {
-            if (!string.IsNullOrWhiteSpace(title)) Title = title;
-            if (!string.IsNullOrWhiteSpace(description)) Description = description;
-            if (status.HasValue) Status = status.Value;
-            if (priority.HasValue) Priority = priority.Value;
-        }
     }
 }

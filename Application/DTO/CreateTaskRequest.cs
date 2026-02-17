@@ -10,6 +10,5 @@ namespace Application.DTO
         public int UserId { get; set; }
         public TaskPriority Priority { get; set; } = TaskPriority.Low;
         public TaskStatus Status { get; set; } = TaskStatus.Draft;
-        public int DisplayOrder { get; set; } = 0;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Application.DTO;
 using Application.Interfaces;
+using AutoMapper;
 using TaskEntity = Domain.Entities.Task;
 
 namespace Application.Services
@@ -7,15 +8,17 @@ namespace Application.Services
     public class TaskService : ITaskService
     {
         private readonly ITaskRepository _taskRepository;
+        private readonly IMapper _mapper;
 
-        public TaskService(ITaskRepository taskRepository)
+        public TaskService(ITaskRepository taskRepository, IMapper mapper)
         {
             _taskRepository = taskRepository;
+            _mapper = mapper;
         }
 
         public async Task<TaskEntity?> CreateTaskAsync(CreateTaskRequest task)
         {
-            var createTask = new TaskEntity(task.Title, task.Description, task.UserId, task.Priority, task.Status);
+            var createTask = _mapper.Map<TaskEntity>(task);
             await _taskRepository.AddAsync(createTask);
             return createTask;
         }
@@ -48,8 +51,7 @@ namespace Application.Services
             {
                 return null;
             }
-
-            task.Update(updatedTask.Title, updatedTask.Description, updatedTask.Status, updatedTask.Priority);
+            _mapper.Map(updatedTask, task);
             await _taskRepository.UpdateAsync(task);
             return task;
         }
