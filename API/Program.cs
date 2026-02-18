@@ -4,6 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Application;
 using Infrastructure;
+using API.Services;
+using Application.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -15,6 +17,8 @@ if (string.IsNullOrWhiteSpace(connectionString))
 // Add services to the container.
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(connectionString);
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

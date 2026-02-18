@@ -10,7 +10,7 @@ namespace Domain.Entities
         public string Description { get; private set; } = null!;
         public TaskStatus Status { get; private set; } = TaskStatus.Draft;
         public TaskPriority Priority { get; private set; } = TaskPriority.Medium;
-        public int UserId { get; private set; }
+        public int UserId { get; set; }
         public User User { get; private set; } = null!;
         public Task(string title, string description, int userId, TaskPriority priority = TaskPriority.Medium, TaskStatus status = TaskStatus.Draft)
         {
