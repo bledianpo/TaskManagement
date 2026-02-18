@@ -17,8 +17,8 @@ if (string.IsNullOrWhiteSpace(connectionString))
 // Add services to the container.
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(connectionString);
-builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
