@@ -9,23 +9,43 @@ namespace Application.Services
     {
         private readonly ITaskRepository _taskRepository;
         private readonly IMapper _mapper;
+        private readonly ICurrentUserService _currentUserService;
 
-        public TaskService(ITaskRepository taskRepository, IMapper mapper)
+        public TaskService(ITaskRepository taskRepository, IMapper mapper, ICurrentUserService currentUserService)
         {
             _taskRepository = taskRepository;
             _mapper = mapper;
+            _currentUserService = currentUserService;
         }
 
         public async Task<TaskEntity?> CreateTaskAsync(CreateTaskRequest task)
         {
-            var createTask = _mapper.Map<TaskEntity>(task);
-            await _taskRepository.AddAsync(createTask);
-            return createTask;
+            var userId = _currentUserService.UserId;
+            if (userId == null)
+            {
+                return null;
+            }
+            var createdTask = _mapper.Map<TaskEntity>(task);
+            createdTask.UserId = userId.Value;
+            await _taskRepository.AddAsync(createdTask);
+            return createdTask;
         }
 
         public async Task<List<TaskEntity>> GetAllTasksAsync(int pageNumber, int pageSize)
         {
-            return await _taskRepository.GetAllAsync(pageNumber, pageSize);
+            if (!_currentUserService.IsAuthenticated)
+            {
+                return new List<TaskEntity>();
+            }
+            else if (_currentUserService.IsAdmin)
+            {
+                return await _taskRepository.GetAllAsync(pageNumber, pageSize);
+            }
+            else if (_currentUserService.UserId is int userId)
+            {
+                return await _taskRepository.GetByUserIdAsync(userId, pageNumber, pageSize);
+            }
+            return new List<TaskEntity>();
         }
 
         public async Task<TaskEntity?> GetTaskByIdAsync(int id)
@@ -35,8 +55,16 @@ namespace Application.Services
             {
                 return null;
             }
+            else if (_currentUserService.IsAdmin)
+            {
+                return task;
+            }
+            else if (_currentUserService.UserId == task.UserId)
+            {
+                return task;
+            }
 
-            return task;
+            return null;
         }
 
         public async Task<TaskEntity?> UpdateTaskAsync(int id, UpdateTaskRequest updatedTask)
@@ -47,7 +75,7 @@ namespace Application.Services
             }
 
             var task = await _taskRepository.GetByIdAsync(id);
-            if (task == null)
+            if (task == null || (!_currentUserService.IsAdmin && _currentUserService.UserId != task.UserId))
             {
                 return null;
             }
@@ -59,7 +87,9 @@ namespace Application.Services
         public async Task<bool> DeleteTaskAsync(int id)
         {
             var task = await _taskRepository.GetByIdAsync(id);
-            if (task == null) return false;
+            if (task == null || (!_currentUserService.IsAdmin && _currentUserService.UserId != task.UserId)) {
+                return false;
+            }
             await _taskRepository.DeleteAsync(task);
             return true;
         }

@@ -1,5 +1,4 @@
 ﻿using Application.Interfaces;
-using Domain.Entities;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using TaskEntity = Domain.Entities.Task;
@@ -39,7 +38,13 @@ namespace Infrastructure.Repositories
 
         public async Task<List<TaskEntity>> GetByUserIdAsync(int userId, int pageNumber, int pageSize)
         {
-            return await _context.Tasks.AsNoTracking().Where(t => t.UserId == userId).OrderBy(t => t.Id).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            return await _context.Tasks
+                .AsNoTracking()
+                .Where(t => t.UserId == userId)
+                .OrderBy(t => t.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
 
         public async Task UpdateAsync(TaskEntity task)
