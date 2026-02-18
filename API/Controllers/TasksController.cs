@@ -1,4 +1,4 @@
-﻿using Application.Interfaces;
+using Application.Interfaces;
 using TaskEntity = Domain.Entities.Task;
 using Application.DTO;
 using Microsoft.AspNetCore.Mvc;
@@ -13,24 +13,21 @@ namespace API.Controllers
     {
         private readonly ITaskService _taskService;
         private const int DefaultPageSize = 10;
-        private const int MaxPageSize = 100;
 
         public TasksController(ITaskService taskService)
         {
             _taskService = taskService;
         }
 
+        private const int MaxPageSize = 100;
+
         [HttpGet]
-        public async Task<IActionResult> GetAll(int pageNumber = 1, int pageSize = DefaultPageSize)
+        public async Task<IActionResult> GetAll([FromQuery] GetTasksQuery query)
         {
-            if (pageNumber < 1)
-            {
-                pageNumber = 1;
-            }
-            if (pageSize < 1 || pageSize > MaxPageSize)
-            {
-                pageSize = DefaultPageSize;
-            }
+            var pageNumber = query.PageNumber ?? 1;
+            var pageSize = query.PageSize ?? DefaultPageSize;
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1 || pageSize > MaxPageSize) pageSize = DefaultPageSize;
             var tasks = await _taskService.GetAllTasksAsync(pageNumber, pageSize);
             return Ok(tasks);
         }
