@@ -1,5 +1,16 @@
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import type { User, AuthContextValue } from "../types/auth";
+import {
+  login as authServiceLogin,
+  register as authServiceRegister,
+} from "../services/authService";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -7,8 +18,9 @@ const TOKEN_KEY = "token";
 const USER_KEY = "user";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const navigate = useNavigate();
   const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<User>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -25,15 +37,48 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
-  const login = useCallback(async (_email: string, _password: string) => {
-    await Promise.resolve();
+  const login = useCallback(async (email: string, password: string) => {
+    try {
+      const data = await authServiceLogin({
+        email: email.trim(),
+        password,
+      });
+
+      const userData: User = {
+        userId: data.userId,
+        email: data.email,
+        isAdmin: data.isAdmin,
+      };
+
+      localStorage.setItem(TOKEN_KEY, data.token);
+      localStorage.setItem(USER_KEY, JSON.stringify(userData));
+
+      setToken(data.token);
+      setUser(userData);
+      alert("Login successful!");
+    } catch (error: any) {
+      setToken(null);
+      setUser(null);
+      alert(error.message || "Login failed");
+    }
   }, []);
 
   const register = useCallback(
-    async (_username: string, _email: string, _password: string) => {
-      await Promise.resolve();
+    async (username: string, email: string, password: string) => {
+      try {
+        await authServiceRegister({
+          username: username.trim(),
+          email: email.trim(),
+          password,
+        });
+
+        alert("Registration successful! Please login.");
+        navigate("/login", { replace: true });
+      } catch (error: any) {
+        alert(error.message || "Registration failed");
+      }
     },
-    []
+    [navigate]
   );
 
   const logout = useCallback(() => {
@@ -41,7 +86,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem(USER_KEY);
     setToken(null);
     setUser(null);
-  }, []);
+    alert("Logged out");
+    navigate("/login", { replace: true });
+  }, [navigate]);
 
   const value: AuthContextValue = {
     token,
