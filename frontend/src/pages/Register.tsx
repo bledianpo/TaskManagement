@@ -4,17 +4,28 @@ import { Box, Button, Text, Input, Field, VStack } from "@chakra-ui/react";
 import { useAuth } from "../contexts";
 import { GRADIENT_BG } from "../constants";
 
-const Login = () => {
+const MIN_PASSWORD_LENGTH = 6;
+
+const Register = () => {
+  const [username, setUsername] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const { login } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    if (!username.trim()) {
+      setError("Username is required");
+      return;
+    }
+    if (username.trim().length < 2) {
+      setError("Username must be at least 2 characters");
+      return;
+    }
     if (!email.trim()) {
       setError("Email is required");
       return;
@@ -23,12 +34,16 @@ const Login = () => {
       setError("Password is required");
       return;
     }
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters`);
+      return;
+    }
     setLoading(true);
     try {
-      await login(email.trim(), password);
+      await register(username.trim(), email.trim().toLowerCase(), password);
       navigate("/tasks", { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(err instanceof Error ? err.message : "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -53,13 +68,25 @@ const Login = () => {
         p={8}
       >
         <Text fontSize="2xl" fontWeight="700" color="#1a202c" mb={2}>
-          Welcome back
+          Create account
         </Text>
         <Text color="#718096" fontSize="sm" mb={6}>
-          Sign in to manage your tasks
+          Register to manage your tasks
         </Text>
         <form onSubmit={handleSubmit}>
           <VStack gap={4} align="stretch">
+            <Field.Root>
+              <Field.Label color="#1a202c" fontWeight="500">Username</Field.Label>
+              <Input
+                type="text"
+                placeholder="Your name"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoComplete="username"
+                borderColor="#e2e8f0"
+                color="#1a202c"
+              />
+            </Field.Root>
             <Field.Root>
               <Field.Label color="#1a202c" fontWeight="500">Email</Field.Label>
               <Input
@@ -76,10 +103,10 @@ const Login = () => {
               <Field.Label color="#1a202c" fontWeight="500">Password</Field.Label>
               <Input
                 type="password"
-                placeholder="••••••••"
+                placeholder="At least 6 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
+                autoComplete="new-password"
                 borderColor="#e2e8f0"
                 color="#1a202c"
               />
@@ -98,19 +125,19 @@ const Login = () => {
               loading={loading}
               disabled={loading}
             >
-              Log in
+              Register
             </Button>
           </VStack>
         </form>
         <Text mt={4} fontSize="sm" color="#718096" textAlign="center">
-          No account?{" "}
-          <Link to="/register" style={{ color: "#4f46e5", fontWeight: 600 }}>
-            Register
+          Already have an account?{" "}
+          <Link to="/login" style={{ color: "#4f46e5", fontWeight: 600 }}>
+            Log in
           </Link>
         </Text>
         <Link to="/">
           <Button variant="ghost" size="sm" color="#718096" mt={2} w="full">
-            Back to home
+          Back to home
           </Button>
         </Link>
       </Box>
@@ -118,4 +145,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
