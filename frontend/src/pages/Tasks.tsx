@@ -20,6 +20,7 @@ import toast from "react-hot-toast";
 import { useAuth } from "../contexts";
 import { GRADIENT_BG } from "../constants";
 import type { Task, TaskStatus } from "../types/task";
+import { getPriorityLabel, getStatusLabel, normalizePriority } from "../types/task";
 import { deleteTask, getTasks } from "../services/taskService";
 import CreateTaskModal from "../components/tasks/CreateTaskModal";
 import EditTaskModal from "../components/tasks/EditTaskModal";
@@ -145,18 +146,18 @@ const Tasks = function () {
                     <Table.Cell>
                       <Badge
                         colorPalette={
-                          task.priority === "High"
+                          normalizePriority(task.priority) === "High"
                             ? "red"
-                            : task.priority === "Medium"
+                            : normalizePriority(task.priority) === "Medium"
                             ? "orange"
                             : "gray"
                         }
                       >
-                        {task.priority}
+                        {getPriorityLabel(task.priority)}
                       </Badge>
                     </Table.Cell>
                     <Table.Cell>
-                      <Badge variant="outline">{task.status}</Badge>
+                      <Badge variant="outline">{getStatusLabel(task.status)}</Badge>
                     </Table.Cell>
                     <Table.Cell textAlign="end">
                       <Button

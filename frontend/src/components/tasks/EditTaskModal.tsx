@@ -21,6 +21,7 @@ import type {
   TaskStatus,
   UpdateTaskRequest,
 } from "../../types/task";
+import { normalizePriority, normalizeStatus } from "../../types/task";
 import { updateTask } from "../../services/taskService";
 
 interface EditTaskModalProps {
@@ -47,8 +48,8 @@ const EditTaskModal = function ({
 
     setTitle(task.title);
     setDescription(task.description);
-    setPriority(task.priority);
-    setStatus(task.status);
+    setPriority(normalizePriority(task.priority));
+    setStatus(normalizeStatus(task.status));
     setError("");
   }, [task]);
 
