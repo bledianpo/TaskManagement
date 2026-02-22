@@ -9,6 +9,7 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { useAuth } from "../contexts";
 import { GRADIENT_BG } from "../constants";
 import type { Task, TaskStatus } from "../types/task";
@@ -45,7 +46,11 @@ const Tasks = function () {
 
   const deleteMutation = useMutation({
     mutationFn: deleteTask,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+    onSuccess: () => {
+      toast.success("Task deleted.");
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+    onError: (err) => toast.error(err?.message || "Failed to delete task."),
   });
 
   if (isLoading) {

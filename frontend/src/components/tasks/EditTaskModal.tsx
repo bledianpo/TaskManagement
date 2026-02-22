@@ -13,6 +13,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { FormSelect, PRIORITY_OPTIONS, STATUS_OPTIONS } from "./shared";
 import type {
   Task,
@@ -54,11 +55,14 @@ const EditTaskModal = function ({
   const updateMutation = useMutation({
     mutationFn: (payload: UpdateTaskRequest) => updateTask(task!.id, payload),
     onSuccess: () => {
+      toast.success("Task updated.");
       onSuccess();
       handleClose();
     },
     onError: (err) => {
-      setError(err?.message || "Failed to update task.");
+      const message = err?.message || "Failed to update task.";
+      setError(message);
+      toast.error(message);
     },
   });
 

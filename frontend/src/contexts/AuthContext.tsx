@@ -5,6 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import toast from "react-hot-toast";
 import type { User, AuthContextValue } from "../types/auth";
 import {
   login as authServiceLogin,
@@ -55,11 +56,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       setToken(data.token);
       setUser(userData);
-      alert("Login successful!");
+      toast.success("Login successful!");
     } catch (error: any) {
       setToken(null);
       setUser(null);
-      alert(error.message || "Login failed");
+      toast.error(error?.message || "Login failed");
     }
   }, []);
 
@@ -72,10 +73,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           password,
         });
 
-        alert("Registration successful! Please login.");
+        toast.success("Registration successful! Please login.");
         navigate("/login", { replace: true });
       } catch (error: any) {
-        alert(error.message || "Registration failed");
+        toast.error(error?.message || "Registration failed");
       }
     },
     [navigate]
@@ -86,7 +87,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem(USER_KEY);
     setToken(null);
     setUser(null);
-    alert("Logged out");
+    toast.success("Logged out");
     navigate("/login", { replace: true });
   }, [navigate]);
 

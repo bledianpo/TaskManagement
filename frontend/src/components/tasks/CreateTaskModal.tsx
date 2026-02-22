@@ -13,6 +13,7 @@ import {
   Text
 } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { FormSelect, PRIORITY_OPTIONS, STATUS_OPTIONS } from "./shared";
 import type {
   CreateTaskRequest,
@@ -46,10 +47,15 @@ const CreateTaskModal = function ({
       setPriority("Low");
       setStatus("Draft");
       setError("");
+      toast.success("Task created.");
       onSuccess();
       onClose();
     },
-    onError: (err) => setError(err?.message || "Failed to create Task."),
+    onError: (err) => {
+      const message = err?.message || "Failed to task.";
+      setError(message);
+      toast.error(message);
+    },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
