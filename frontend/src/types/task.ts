@@ -32,3 +32,9 @@ export interface UpdateTaskRequest {
   priority?: TaskPriority;
   status?: TaskStatus;
 }
+
+export interface GetTasksParams {
+  pageNumber?: number;
+  pageSize?: number;
+  status?: TaskStatus | "";
+}

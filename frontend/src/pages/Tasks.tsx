@@ -11,23 +11,35 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../contexts";
 import { GRADIENT_BG } from "../constants";
-import type { Task } from "../types/task";
+import type { Task, TaskStatus } from "../types/task";
 import { deleteTask, getTasks } from "../services/taskService";
 import CreateTaskModal from "../components/tasks/CreateTaskModal";
 import EditTaskModal from "../components/tasks/EditTaskModal";
+import { FormSelect, STATUS_OPTIONS } from "../components/tasks/shared";
 
 const PAGE_SIZE = 10;
+
+const STATUS_FILTER_OPTIONS = [
+  { value: "", label: "All statuses" },
+  ...STATUS_OPTIONS,
+];
 
 const Tasks = function () {
   const queryClient = useQueryClient();
   const [page, setPage] = useState<number>(1);
+  const [statusFilter, setStatusFilter] = useState<TaskStatus | "">("");
   const [createOpen, setCreateOpen] = useState<boolean>(false);
   const [editTask, setEditTask] = useState<Task | null>(null);
   const { user } = useAuth();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["tasks", user?.userId, page],
-    queryFn: () => getTasks({ pageNumber: page, pageSize: PAGE_SIZE }),
+    queryKey: ["tasks", user?.userId, page, statusFilter],
+    queryFn: () =>
+      getTasks({
+        pageNumber: page,
+        pageSize: PAGE_SIZE,
+        ...(statusFilter ? { status: statusFilter } : {}),
+      }),
     refetchOnWindowFocus: false,
   });
 
@@ -69,13 +81,24 @@ const Tasks = function () {
     <Box minH="100vh" bg={GRADIENT_BG}>
       <Box px={4} py={6} maxW="900px" mx="auto">
         <Box bg="white" borderRadius="1.5rem" p={6} boxShadow="lg">
-          <Flex justify="space-between" align="center" mb={6}>
+          <Flex justify="space-between" align="center" mb={6} flexWrap="wrap" gap={4}>
             <Text fontSize="2xl" fontWeight="700" color="gray.800">
               My Tasks
             </Text>
-            <Button colorPalette="blue" onClick={() => setCreateOpen(true)}>
-              Add task
-            </Button>
+            <Flex align="center" gap={3}>
+              <FormSelect
+                label="Status"
+                value={statusFilter}
+                options={STATUS_FILTER_OPTIONS}
+                onChange={(v) => {
+                  setStatusFilter(v as TaskStatus | "");
+                  setPage(1);
+                }}
+              />
+              <Button colorPalette="blue" onClick={() => setCreateOpen(true)}>
+                Add task
+              </Button>
+            </Flex>
           </Flex>
           <Table.Root size="sm">
             <Table.Header>

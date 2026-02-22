@@ -1,9 +1,9 @@
-import type { CreateTaskRequest, UpdateTaskRequest } from "../types/task";
+import type { CreateTaskRequest, UpdateTaskRequest, GetTasksParams } from "../types/task";
 import { api } from "./api";
 
 const BASE = "/tasks";
 
-export const getTasks = async function (params = {}) {
+export const getTasks = async function (params: GetTasksParams = {}) {
   const { data } = await api.get(BASE, { params });
   return data;
 };
