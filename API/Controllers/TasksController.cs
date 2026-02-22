@@ -28,7 +28,7 @@ namespace API.Controllers
             var pageSize = query.PageSize ?? DefaultPageSize;
             if (pageNumber < 1) pageNumber = 1;
             if (pageSize < 1 || pageSize > MaxPageSize) pageSize = DefaultPageSize;
-            var tasks = await _taskService.GetAllTasksAsync(pageNumber, pageSize);
+            var tasks = await _taskService.GetTasksPagedAsync(pageNumber, pageSize);
             return Ok(tasks);
         }
 

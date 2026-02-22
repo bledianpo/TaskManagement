@@ -31,21 +31,38 @@ namespace Application.Services
             return createdTask;
         }
 
-        public async Task<List<TaskEntity>> GetAllTasksAsync(int pageNumber, int pageSize)
+        public async Task<PagedResult<TaskEntity>> GetTasksPagedAsync(int pageNumber, int pageSize)
         {
             if (!_currentUserService.IsAuthenticated)
             {
-                return new List<TaskEntity>();
+                return BuildPagedResult(new List<TaskEntity>(), 0, pageNumber, pageSize);
             }
             else if (_currentUserService.IsAdmin)
             {
-                return await _taskRepository.GetAllAsync(pageNumber, pageSize);
+                var items = await _taskRepository.GetAllAsync(pageNumber, pageSize);
+                var total = await _taskRepository.GetAllCountAsync();
+                return BuildPagedResult(items, total, pageNumber, pageSize);
             }
             else if (_currentUserService.UserId is int userId)
             {
-                return await _taskRepository.GetByUserIdAsync(userId, pageNumber, pageSize);
+                var items = await _taskRepository.GetByUserIdAsync(userId, pageNumber, pageSize);
+                var total = await _taskRepository.GetCountByUserIdAsync(userId);
+                return BuildPagedResult(items, total, pageNumber, pageSize);
             }
-            return new List<TaskEntity>();
+            return BuildPagedResult(new List<TaskEntity>(), 0, pageNumber, pageSize);
+        }
+
+        private static PagedResult<TaskEntity> BuildPagedResult(List<TaskEntity> items, int totalCount, int pageNumber, int pageSize)
+        {
+            var totalPages = pageSize > 0 ? (int)Math.Ceiling(totalCount / (double)pageSize) : 0;
+            return new PagedResult<TaskEntity>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalPages = totalPages
+            };
         }
 
         public async Task<TaskEntity?> GetTaskByIdAsync(int id)
@@ -87,7 +104,8 @@ namespace Application.Services
         public async Task<bool> DeleteTaskAsync(int id)
         {
             var task = await _taskRepository.GetByIdAsync(id);
-            if (task == null || (!_currentUserService.IsAdmin && _currentUserService.UserId != task.UserId)) {
+            if (task == null || (!_currentUserService.IsAdmin && _currentUserService.UserId != task.UserId))
+            {
                 return false;
             }
             await _taskRepository.DeleteAsync(task);

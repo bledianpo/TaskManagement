@@ -30,6 +30,10 @@ namespace Infrastructure.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+        public async Task<int> GetAllCountAsync()
+        {
+            return await _context.Tasks.CountAsync();
+        }
 
         public async Task<TaskEntity?> GetByIdAsync(int id)
         {
@@ -45,6 +49,11 @@ namespace Infrastructure.Repositories
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+        }
+
+        public async Task<int> GetCountByUserIdAsync(int userId)
+        {
+            return await _context.Tasks.CountAsync(t => t.UserId == userId);
         }
 
         public async Task UpdateAsync(TaskEntity task)
