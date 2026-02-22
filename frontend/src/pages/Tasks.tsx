@@ -7,6 +7,13 @@ import {
   Flex,
   Badge,
   Spinner,
+  DialogRoot,
+  DialogBackdrop,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogBody,
+  DialogFooter,
 } from "@chakra-ui/react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -31,6 +38,7 @@ const Tasks = function () {
   const [statusFilter, setStatusFilter] = useState<TaskStatus | "">("");
   const [createOpen, setCreateOpen] = useState<boolean>(false);
   const [editTask, setEditTask] = useState<Task | null>(null);
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const { user } = useAuth();
 
   const { data, isLoading, error } = useQuery({
@@ -163,10 +171,7 @@ const Tasks = function () {
                         colorPalette="red"
                         variant="ghost"
                         ml={2}
-                        onClick={() =>
-                          confirm("Delete this task?") &&
-                          deleteMutation.mutate(task.id)
-                        }
+                        onClick={() => setTaskToDelete(task)}
                       >
                         Delete
                       </Button>
@@ -210,6 +215,46 @@ const Tasks = function () {
         task={editTask}
         onSuccess={() => queryClient.invalidateQueries({ queryKey: ["tasks"] })}
       />
+      <DialogRoot
+        open={!!taskToDelete}
+        onOpenChange={(e) => !e.open && setTaskToDelete(null)}
+      >
+        <DialogBackdrop />
+        <DialogContent
+          position="fixed"
+          top="50%"
+          left="50%"
+          transform="translate(-50%, -50%)"
+          margin="0"
+        >
+          <DialogHeader>
+            <DialogTitle>Delete task</DialogTitle>
+          </DialogHeader>
+          <DialogBody>
+            <Text>
+              Delete &quot;{taskToDelete?.title}&quot;? This cannot be undone.
+            </Text>
+          </DialogBody>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTaskToDelete(null)}>
+              Cancel
+            </Button>
+            <Button
+              colorPalette="red"
+              loading={deleteMutation.isPending}
+              onClick={() => {
+                if (taskToDelete) {
+                  deleteMutation.mutate(taskToDelete.id, {
+                    onSettled: () => setTaskToDelete(null),
+                  });
+                }
+              }}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </DialogRoot>
     </Box>
   );
 };
