@@ -19,7 +19,7 @@ namespace Infrastructure.Repositories
         {
             if (string.IsNullOrWhiteSpace(email)) return null;
             var normalized = email.Trim().ToLowerInvariant();
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == normalized, cancellationToken);
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == normalized, cancellationToken);
         }
 
         public async Task AddAsync(User user, CancellationToken cancellationToken = default)

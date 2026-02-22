@@ -1,7 +1,9 @@
-﻿using Application.DTO;
+using Application.DTO;
 using Application.Interfaces;
 using AutoMapper;
+using Domain.Enums;
 using TaskEntity = Domain.Entities.Task;
+using TaskStatus = Domain.Enums.TaskStatus;
 
 namespace Application.Services
 {
@@ -23,33 +25,48 @@ namespace Application.Services
             var userId = _currentUserService.UserId;
             if (userId == null)
             {
-                return null;
+                throw new UnauthorizedAccessException("User is not authenticated.");
             }
-            var createdTask = _mapper.Map<TaskEntity>(task);
-            createdTask.UserId = userId.Value;
+            var priority = ParsePriority(task.Priority);
+            var status = ParseStatus(task.Status) ?? TaskStatus.Draft;
+            var createdTask = new TaskEntity(task.Title, task.Description, userId.Value, priority, status);
             await _taskRepository.AddAsync(createdTask, cancellationToken);
             return createdTask;
         }
 
-        public async Task<PagedResult<TaskEntity>> GetTasksPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        private static TaskPriority ParsePriority(string? value)
         {
+            if (string.IsNullOrWhiteSpace(value)) return TaskPriority.Medium;
+            return Enum.TryParse<TaskPriority>(value, true, out var p) ? p : TaskPriority.Medium;
+        }
+
+        public async Task<PagedResult<TaskEntity>> GetTasksPagedAsync(int pageNumber, int pageSize, string? status = null, CancellationToken cancellationToken = default)
+        {
+            var statusFilter = ParseStatus(status);
+
             if (!_currentUserService.IsAuthenticated)
             {
                 return BuildPagedResult(new List<TaskEntity>(), 0, pageNumber, pageSize);
             }
-            else if (_currentUserService.IsAdmin)
+            if (_currentUserService.IsAdmin)
             {
-                var items = await _taskRepository.GetAllAsync(pageNumber, pageSize, cancellationToken);
-                var total = await _taskRepository.GetAllCountAsync(cancellationToken);
+                var items = await _taskRepository.GetAllAsync(pageNumber, pageSize, statusFilter, cancellationToken);
+                var total = await _taskRepository.GetAllCountAsync(statusFilter, cancellationToken);
                 return BuildPagedResult(items, total, pageNumber, pageSize);
             }
-            else if (_currentUserService.UserId is int userId)
+            if (_currentUserService.UserId is int userId)
             {
-                var items = await _taskRepository.GetByUserIdAsync(userId, pageNumber, pageSize, cancellationToken);
-                var total = await _taskRepository.GetCountByUserIdAsync(userId, cancellationToken);
+                var items = await _taskRepository.GetByUserIdAsync(userId, pageNumber, pageSize, statusFilter, cancellationToken);
+                var total = await _taskRepository.GetCountByUserIdAsync(userId, statusFilter, cancellationToken);
                 return BuildPagedResult(items, total, pageNumber, pageSize);
             }
             return BuildPagedResult(new List<TaskEntity>(), 0, pageNumber, pageSize);
+        }
+
+        private static TaskStatus? ParseStatus(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return null;
+            return Enum.TryParse<TaskStatus>(value, true, out var s) ? s : null;
         }
 
         private static PagedResult<TaskEntity> BuildPagedResult(List<TaskEntity> items, int totalCount, int pageNumber, int pageSize)
