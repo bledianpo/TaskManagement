@@ -37,7 +37,7 @@ namespace API.Controllers
             var task = await _taskService.GetTaskByIdAsync(id, cancellationToken);
             if (task == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Task not found or you do not have access to it." });
             }
             return Ok(task);
         }
@@ -60,7 +60,7 @@ namespace API.Controllers
             var task = await _taskService.UpdateTaskAsync(id, updatedTask, cancellationToken);
             if (task == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Task not found or you do not have access to it." });
             }
             return Ok(task);
         }
@@ -71,7 +71,7 @@ namespace API.Controllers
             var deleted = await _taskService.DeleteTaskAsync(id, cancellationToken);
             if (!deleted)
             {
-                return NotFound();
+                return NotFound(new { message = "Task not found or you do not have access to it." });
             }
             return NoContent();
         }

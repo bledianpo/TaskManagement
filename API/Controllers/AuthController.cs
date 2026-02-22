@@ -22,7 +22,7 @@ namespace API.Controllers
 
             if (!result.Success)
             {
-                return BadRequest(result.Error);
+                return BadRequest(new { message = result.Error });
             }
 
             return Ok(new { message = "Registered successfully" });
