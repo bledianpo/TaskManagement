@@ -9,10 +9,10 @@ namespace Domain.Entities
         public string Title { get; private set; } = null!;
         public string Description { get; private set; } = null!;
         public TaskStatus Status { get; private set; } = TaskStatus.Draft;
-        public TaskPriority Priority { get; private set; } = TaskPriority.Medium;
+        public TaskPriority Priority { get; private set; } = TaskPriority.Low;
         public int UserId { get; set; }
         public User User { get; private set; } = null!;
-        public Task(string title, string description, int userId, TaskPriority priority = TaskPriority.Medium, TaskStatus status = TaskStatus.Draft)
+        public Task(string title, string description, int userId, TaskPriority priority = TaskPriority.Low, TaskStatus status = TaskStatus.Draft)
         {
             Title = title;
             Description = description;

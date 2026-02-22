@@ -1,4 +1,3 @@
-﻿
 using Application.DTO;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -17,9 +16,9 @@ namespace API.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] Register dto)
+        public async Task<IActionResult> Register([FromBody] Register dto, CancellationToken cancellationToken = default)
         {
-            var result = await _authService.RegisterAsync(dto);
+            var result = await _authService.RegisterAsync(dto, cancellationToken);
 
             if (!result.Success)
             {
@@ -30,17 +29,16 @@ namespace API.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] Login dto)
+        public async Task<IActionResult> Login([FromBody] Login dto, CancellationToken cancellationToken = default)
         {
-            var result = await _authService.LoginAsync(dto);
+            var result = await _authService.LoginAsync(dto, cancellationToken);
 
             if (result == null)
             {
-                return Unauthorized();
+                return Unauthorized(new { message = "Invalid email or password" });
             }
 
             return Ok(result);
         }
     }
-
 }

@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+using Application.Interfaces;
+using Domain.Enums;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using TaskEntity = Domain.Entities.Task;
@@ -15,32 +16,33 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task AddAsync(TaskEntity task)
+        public async Task AddAsync(TaskEntity task, CancellationToken cancellationToken = default)
         {
             _context.Tasks.Add(task);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<List<TaskEntity>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<List<TaskEntity>> GetAllAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             return await _context.Tasks
                 .AsNoTracking()
                 .OrderBy(t => t.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .ToListAsync();
-        }
-        public async Task<int> GetAllCountAsync()
-        {
-            return await _context.Tasks.CountAsync();
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<TaskEntity?> GetByIdAsync(int id)
+        public async Task<int> GetAllCountAsync(CancellationToken cancellationToken = default)
         {
-            return await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id);
+            return await _context.Tasks.CountAsync(cancellationToken);
         }
 
-        public async Task<List<TaskEntity>> GetByUserIdAsync(int userId, int pageNumber, int pageSize)
+        public async Task<TaskEntity?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+        }
+
+        public async Task<List<TaskEntity>> GetByUserIdAsync(int userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             return await _context.Tasks
                 .AsNoTracking()
@@ -48,24 +50,25 @@ namespace Infrastructure.Repositories
                 .OrderBy(t => t.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<int> GetCountByUserIdAsync(int userId)
+        public async Task<int> GetCountByUserIdAsync(int userId, CancellationToken cancellationToken = default)
         {
-            return await _context.Tasks.CountAsync(t => t.UserId == userId);
+            var query = _context.Tasks.Where(t => t.UserId == userId);
+            return await query.CountAsync(cancellationToken);
         }
 
-        public async Task UpdateAsync(TaskEntity task)
+        public async Task UpdateAsync(TaskEntity task, CancellationToken cancellationToken = default)
         {
             _context.Tasks.Update(task);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task DeleteAsync(TaskEntity task)
+        public async Task DeleteAsync(TaskEntity task, CancellationToken cancellationToken = default)
         {
             _context.Tasks.Remove(task);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

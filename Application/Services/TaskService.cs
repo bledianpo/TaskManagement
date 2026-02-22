@@ -18,7 +18,7 @@ namespace Application.Services
             _currentUserService = currentUserService;
         }
 
-        public async Task<TaskEntity?> CreateTaskAsync(CreateTaskRequest task)
+        public async Task<TaskEntity?> CreateTaskAsync(CreateTaskRequest task, CancellationToken cancellationToken = default)
         {
             var userId = _currentUserService.UserId;
             if (userId == null)
@@ -27,11 +27,11 @@ namespace Application.Services
             }
             var createdTask = _mapper.Map<TaskEntity>(task);
             createdTask.UserId = userId.Value;
-            await _taskRepository.AddAsync(createdTask);
+            await _taskRepository.AddAsync(createdTask, cancellationToken);
             return createdTask;
         }
 
-        public async Task<PagedResult<TaskEntity>> GetTasksPagedAsync(int pageNumber, int pageSize)
+        public async Task<PagedResult<TaskEntity>> GetTasksPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             if (!_currentUserService.IsAuthenticated)
             {
@@ -39,14 +39,14 @@ namespace Application.Services
             }
             else if (_currentUserService.IsAdmin)
             {
-                var items = await _taskRepository.GetAllAsync(pageNumber, pageSize);
-                var total = await _taskRepository.GetAllCountAsync();
+                var items = await _taskRepository.GetAllAsync(pageNumber, pageSize, cancellationToken);
+                var total = await _taskRepository.GetAllCountAsync(cancellationToken);
                 return BuildPagedResult(items, total, pageNumber, pageSize);
             }
             else if (_currentUserService.UserId is int userId)
             {
-                var items = await _taskRepository.GetByUserIdAsync(userId, pageNumber, pageSize);
-                var total = await _taskRepository.GetCountByUserIdAsync(userId);
+                var items = await _taskRepository.GetByUserIdAsync(userId, pageNumber, pageSize, cancellationToken);
+                var total = await _taskRepository.GetCountByUserIdAsync(userId, cancellationToken);
                 return BuildPagedResult(items, total, pageNumber, pageSize);
             }
             return BuildPagedResult(new List<TaskEntity>(), 0, pageNumber, pageSize);
@@ -65,9 +65,9 @@ namespace Application.Services
             };
         }
 
-        public async Task<TaskEntity?> GetTaskByIdAsync(int id)
+        public async Task<TaskEntity?> GetTaskByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            var task = await _taskRepository.GetByIdAsync(id);
+            var task = await _taskRepository.GetByIdAsync(id, cancellationToken);
             if (task == null)
             {
                 return null;
@@ -84,31 +84,31 @@ namespace Application.Services
             return null;
         }
 
-        public async Task<TaskEntity?> UpdateTaskAsync(int id, UpdateTaskRequest updatedTask)
+        public async Task<TaskEntity?> UpdateTaskAsync(int id, UpdateTaskRequest updatedTask, CancellationToken cancellationToken = default)
         {
             if (updatedTask == null)
             {
                 throw new ArgumentNullException(nameof(updatedTask));
             }
 
-            var task = await _taskRepository.GetByIdAsync(id);
+            var task = await _taskRepository.GetByIdAsync(id, cancellationToken);
             if (task == null || (!_currentUserService.IsAdmin && _currentUserService.UserId != task.UserId))
             {
                 return null;
             }
             _mapper.Map(updatedTask, task);
-            await _taskRepository.UpdateAsync(task);
+            await _taskRepository.UpdateAsync(task, cancellationToken);
             return task;
         }
 
-        public async Task<bool> DeleteTaskAsync(int id)
+        public async Task<bool> DeleteTaskAsync(int id, CancellationToken cancellationToken = default)
         {
-            var task = await _taskRepository.GetByIdAsync(id);
+            var task = await _taskRepository.GetByIdAsync(id, cancellationToken);
             if (task == null || (!_currentUserService.IsAdmin && _currentUserService.UserId != task.UserId))
             {
                 return false;
             }
-            await _taskRepository.DeleteAsync(task);
+            await _taskRepository.DeleteAsync(task, cancellationToken);
             return true;
         }
     }

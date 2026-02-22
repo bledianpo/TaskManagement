@@ -20,10 +20,10 @@ namespace Application.Services
             _jwtService = jwtService;
         }
 
-        public async Task<Result> RegisterAsync(Register dto)
+        public async Task<Result> RegisterAsync(Register dto, CancellationToken cancellationToken = default)
         {
             var email = dto.Email?.Trim().ToLowerInvariant() ?? "";
-            var existUser = await _userRepository.GetByEmailAsync(email);
+            var existUser = await _userRepository.GetByEmailAsync(email, cancellationToken);
             if (existUser != null)
             {
                 return Result.Fail("Email already registered");
@@ -35,16 +35,16 @@ namespace Application.Services
                 _passwordHasher.Hash(dto.Password?.Trim() ?? ""),
                 isAdmin: false);
 
-            await _userRepository.AddAsync(user);
+            await _userRepository.AddAsync(user, cancellationToken);
 
             return Result.Ok();
         }
 
-        public async Task<LoginResponse?> LoginAsync(Login dto)
+        public async Task<LoginResponse?> LoginAsync(Login dto, CancellationToken cancellationToken = default)
         {
             var email = dto.Email?.Trim().ToLowerInvariant() ?? "";
             var password = dto.Password ?? "";
-            var user = await _userRepository.GetByEmailAsync(email);
+            var user = await _userRepository.GetByEmailAsync(email, cancellationToken);
 
             if (user == null || !_passwordHasher.Verify(password, user.Password))
             {
