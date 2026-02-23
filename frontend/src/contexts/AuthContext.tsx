@@ -11,7 +11,7 @@ import {
   login as authServiceLogin,
   register as authServiceRegister,
 } from "../services/authService";
-import { AUTH_SESSION_EXPIRED_EVENT } from "../services/api";
+import { AUTH_SESSION_EXPIRED_EVENT, getApiErrorMessage } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -70,10 +70,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setToken(data.token);
       setUser(userData);
       toast.success("Login successful!");
-    } catch (error: any) {
+    } catch (error) {
       setToken(null);
       setUser(null);
-      throw new Error(error?.message || "Login failed");
+      throw new Error(getApiErrorMessage(error, "Login failed"));
     }
   }, []);
 
@@ -88,8 +88,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         toast.success("Registration successful! Please login.");
         navigate("/login", { replace: true });
-      } catch (error: any) {
-        throw new Error(error?.message || "Registration failed");
+      } catch (error) {
+        throw new Error(getApiErrorMessage(error, "Registration failed"));
       }
     },
     [navigate]

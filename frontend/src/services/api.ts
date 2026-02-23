@@ -11,6 +11,23 @@ const USER_KEY = "user";
 
 export const AUTH_SESSION_EXPIRED_EVENT = "auth:sessionExpired";
 
+export const getApiErrorMessage = function (
+  error: unknown,
+  fallback: string
+): string {
+  if (error && typeof error === "object" && "response" in error) {
+    const res = (error as { response?: { data?: { message?: string } } }).response;
+    const msg = res?.data?.message;
+    if (typeof msg === "string" && msg.trim()) {
+      return msg;
+    }
+  }
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+  return fallback;
+};
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem(TOKEN_KEY);
   if (token) {
