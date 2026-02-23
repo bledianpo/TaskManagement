@@ -25,7 +25,7 @@ const Navbar = () => {
           <>
             {user && (
               <>
-                <Text fontSize="sm" color="gray.600" maxW={{ base: "120px", sm: "180px" }} noOfLines={1} title={user.email}>
+                <Text fontSize="sm" color="gray.600" maxW={{ base: "120px", sm: "180px" }} title={user.email}>
                   {user.email}
                 </Text>
                 <Badge colorPalette={user.isAdmin ? "purple" : "gray"} size="sm">
