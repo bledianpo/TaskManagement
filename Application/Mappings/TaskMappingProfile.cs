@@ -11,6 +11,7 @@ namespace Application.Mappings
         public TaskMappingProfile()
         {
             CreateMap<CreateTaskRequest, TaskEntity>()
+                .ForMember(d => d.UserId, opt => opt.Ignore())
                 .ForMember(d => d.Priority, opt => opt.MapFrom(s => ParsePriority(s.Priority)))
                 .ForMember(d => d.Status, opt => opt.MapFrom(s => ParseStatus(s.Status)));
 
