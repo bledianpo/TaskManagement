@@ -53,7 +53,14 @@ const AppRouter = () => (
   <Box minH="100vh" w="100%">
     <Navbar />
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route
+        path="/"
+        element={
+          <GuestRoute>
+            <Home />
+          </GuestRoute>
+        }
+      />
       <Route
         path="/login"
         element={

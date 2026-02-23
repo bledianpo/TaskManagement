@@ -11,6 +11,7 @@ import {
   login as authServiceLogin,
   register as authServiceRegister,
 } from "../services/authService";
+import { AUTH_SESSION_EXPIRED_EVENT } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -38,6 +39,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      setToken(null);
+      setUser(null);
+      toast.error("Session expired. Please log in again.");
+      navigate("/login", { replace: true });
+    };
+    window.addEventListener(AUTH_SESSION_EXPIRED_EVENT, handleSessionExpired);
+    return () =>
+      window.removeEventListener(AUTH_SESSION_EXPIRED_EVENT, handleSessionExpired);
+  }, [navigate]);
+
   const login = useCallback(async (email: string, password: string) => {
     try {
       const data = await authServiceLogin({
@@ -60,7 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error: any) {
       setToken(null);
       setUser(null);
-      toast.error(error?.message || "Login failed");
+      throw new Error(error?.message || "Login failed");
     }
   }, []);
 
@@ -76,7 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         toast.success("Registration successful! Please login.");
         navigate("/login", { replace: true });
       } catch (error: any) {
-        toast.error(error?.message || "Registration failed");
+        throw new Error(error?.message || "Registration failed");
       }
     },
     [navigate]

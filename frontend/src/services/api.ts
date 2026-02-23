@@ -6,12 +6,32 @@ export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? defaultBaseURL,
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+const TOKEN_KEY = "token";
+const USER_KEY = "user";
 
+export const AUTH_SESSION_EXPIRED_EVENT = "auth:sessionExpired";
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem(TOKEN_KEY);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      const url = error.config?.url ?? "";
+      const isLoginOrRegister =
+        url.includes("/auth/login") || url.includes("/auth/register");
+      if (!isLoginOrRegister) {
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(USER_KEY);
+        window.dispatchEvent(new CustomEvent(AUTH_SESSION_EXPIRED_EVENT));
+      }
+    }
+    return Promise.reject(error);
+  }
+);

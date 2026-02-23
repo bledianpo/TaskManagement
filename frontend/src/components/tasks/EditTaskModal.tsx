@@ -61,9 +61,7 @@ const EditTaskModal = function ({
       handleClose();
     },
     onError: (err) => {
-      const message = err?.message || "Failed to update task.";
-      setError(message);
-      toast.error(message);
+      setError(err?.message || "Failed to update task.");
     },
   });
 

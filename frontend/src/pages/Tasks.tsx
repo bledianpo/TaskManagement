@@ -97,7 +97,7 @@ const Tasks = function () {
         <Box bg="white" borderRadius="1.5rem" p={6} boxShadow="lg">
           <Flex justify="space-between" align="center" mb={6} flexWrap="wrap" gap={4}>
             <Text fontSize="2xl" fontWeight="700" color="gray.800">
-              My Tasks
+              {user?.isAdmin ? "All Tasks" : "My Tasks"}
             </Text>
             <Flex align="center" gap={3}>
               <FormSelect
@@ -108,6 +108,7 @@ const Tasks = function () {
                   setStatusFilter(v as TaskStatus | "");
                   setPage(1);
                 }}
+                inline
               />
               <Button colorPalette="blue" onClick={() => setCreateOpen(true)}>
                 Add task

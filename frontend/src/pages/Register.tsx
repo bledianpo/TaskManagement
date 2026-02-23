@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Box, Button, Text, Input, Field, VStack } from "@chakra-ui/react";
 import { useAuth } from "../contexts";
-import { GRADIENT_BG } from "../constants";
-
-const MIN_PASSWORD_LENGTH = 6;
+import { GRADIENT_BG, MIN_PASSWORD_LENGTH } from "../constants";
 
 const Register = () => {
   const [username, setUsername] = useState<string>("");
@@ -13,7 +11,6 @@ const Register = () => {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const { register } = useAuth();
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +38,6 @@ const Register = () => {
     setLoading(true);
     try {
       await register(username.trim(), email.trim().toLowerCase(), password);
-      navigate("/tasks", { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
     } finally {
@@ -110,6 +106,9 @@ const Register = () => {
                 borderColor="#e2e8f0"
                 color="#1a202c"
               />
+              <Field.HelperText color="#718096" fontSize="xs" mt={1}>
+                Minimum {MIN_PASSWORD_LENGTH} characters
+              </Field.HelperText>
             </Field.Root>
             {error && (
               <Text color="red.500" fontSize="sm">

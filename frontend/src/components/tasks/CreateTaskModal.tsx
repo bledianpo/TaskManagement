@@ -52,9 +52,7 @@ const CreateTaskModal = function ({
       onClose();
     },
     onError: (err) => {
-      const message = err?.message || "Failed to task.";
-      setError(message);
-      toast.error(message);
+      setError(err?.message || "Failed to create task.");
     },
   });
 

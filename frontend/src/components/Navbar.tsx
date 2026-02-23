@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import { Box, Flex, Button, Heading } from "@chakra-ui/react";
+import { Box, Flex, Button, Heading, Text, Badge } from "@chakra-ui/react";
 import { useAuth } from "../contexts";
 
 const Navbar = () => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
 
   return (
     <Flex
@@ -18,9 +18,19 @@ const Navbar = () => {
           Task Management
         </Heading>
       </Link>
-      <Box display="flex" gap={2}>
+      <Box display="flex" alignItems="center" gap={3}>
         {isAuthenticated ? (
           <>
+            {user && (
+              <>
+                <Text fontSize="sm" color="gray.600" maxW="180px" title={user.email}>
+                  {user.email}
+                </Text>
+                <Badge colorPalette={user.isAdmin ? "purple" : "gray"} size="sm">
+                  {user.isAdmin ? "Admin" : "User"}
+                </Badge>
+              </>
+            )}
             <Link to="/tasks">
               <Button
                 size="sm"
@@ -28,7 +38,7 @@ const Navbar = () => {
                 color="white"
                 _hover={{ bg: "#4338ca" }}
               >
-                My Tasks
+                {user?.isAdmin ? "All Tasks" : "My Tasks"}
               </Button>
             </Link>
             <Button
