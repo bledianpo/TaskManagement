@@ -15,13 +15,13 @@ const Home = () => {
       py={12}
       bg={GRADIENT_BG}
     >
-      <Text fontSize="3xl" fontWeight="800" color="white" mb={4}>
+      <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="800" color="white" mb={4} textAlign="center">
         Task Management
       </Text>
-      <Text color="white" opacity={0.9} mb={8} textAlign="center">
+      <Text color="white" opacity={0.9} mb={8} textAlign="center" px={2}>
         Log in or create an account to manage your tasks.
       </Text>
-      <Box display="flex" gap={4}>
+      <Box display="flex" flexWrap="wrap" gap={4} justifyContent="center">
         <Link to="/login">
           <Button colorScheme="whiteAlpha" bg="white" color="#4f46e5" size="lg">
             Log in

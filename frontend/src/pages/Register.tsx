@@ -52,7 +52,7 @@ const Register = () => {
       display="flex"
       alignItems="center"
       justifyContent="center"
-      p={4}
+      p={{ base: 3, md: 4 }}
       bg={GRADIENT_BG}
     >
       <Box
@@ -61,7 +61,7 @@ const Register = () => {
         bg="rgba(255,255,255,0.98)"
         borderRadius="1.5rem"
         boxShadow="0 25px 50px -12px rgba(0,0,0,0.25)"
-        p={8}
+        p={{ base: 5, md: 8 }}
       >
         <Text fontSize="2xl" fontWeight="700" color="#1a202c" mb={2}>
           Create account

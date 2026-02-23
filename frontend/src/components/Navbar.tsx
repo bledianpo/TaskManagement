@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Box, Flex, Button, Heading, Text, Badge } from "@chakra-ui/react";
+import { Flex, Button, Heading, Text, Badge } from "@chakra-ui/react";
 import { useAuth } from "../contexts";
 
 const Navbar = () => {
@@ -9,7 +9,9 @@ const Navbar = () => {
     <Flex
       justify="space-between"
       align="center"
-      p={4}
+      wrap="wrap"
+      gap={3}
+      p={{ base: 3, md: 4 }}
       bg="white"
       boxShadow="0 1px 3px rgba(0,0,0,0.1)"
     >
@@ -18,12 +20,12 @@ const Navbar = () => {
           Task Management
         </Heading>
       </Link>
-      <Box display="flex" alignItems="center" gap={3}>
+      <Flex align="center" gap={2} flexWrap="wrap" justifyContent="flex-end">
         {isAuthenticated ? (
           <>
             {user && (
               <>
-                <Text fontSize="sm" color="gray.600" maxW="180px" title={user.email}>
+                <Text fontSize="sm" color="gray.600" maxW={{ base: "120px", sm: "180px" }} noOfLines={1} title={user.email}>
                   {user.email}
                 </Text>
                 <Badge colorPalette={user.isAdmin ? "purple" : "gray"} size="sm">
@@ -75,7 +77,7 @@ const Navbar = () => {
             </Link>
           </>
         )}
-      </Box>
+      </Flex>
     </Flex>
   );
 };

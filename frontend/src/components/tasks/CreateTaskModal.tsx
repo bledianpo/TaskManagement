@@ -81,6 +81,7 @@ const CreateTaskModal = function ({
         left="50%"
         transform="translate(-50%, -50%)"
         margin="0"
+        maxW={{ base: "calc(100% - 2rem)", sm: "440px" }}
         maxH="90vh"
         overflowY="auto"
       >

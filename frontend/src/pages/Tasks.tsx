@@ -93,8 +93,8 @@ const Tasks = function () {
 
   return (
     <Box minH="100vh" bg={GRADIENT_BG}>
-      <Box px={4} py={6} maxW="900px" mx="auto">
-        <Box bg="white" borderRadius="1.5rem" p={6} boxShadow="lg">
+      <Box px={{ base: 3, md: 4 }} py={{ base: 4, md: 6 }} maxW="900px" mx="auto" w="100%">
+        <Box bg="white" borderRadius="1.5rem" p={{ base: 4, md: 6 }} boxShadow="lg">
           <Flex justify="space-between" align="center" mb={6} flexWrap="wrap" gap={4}>
             <Text fontSize="2xl" fontWeight="700" color="gray.800">
               {user?.isAdmin ? "All Tasks" : "My Tasks"}
@@ -115,6 +115,7 @@ const Tasks = function () {
               </Button>
             </Flex>
           </Flex>
+          <Box overflowX="auto" w="100%" minW="0">
           <Table.Root size="sm">
             <Table.Header>
               <Table.Row>
@@ -183,6 +184,7 @@ const Tasks = function () {
               )}
             </Table.Body>
           </Table.Root>
+          </Box>
           {totalPages > 1 && (
             <Flex gap={2} mt={4} justify="center" align="center">
               <Button
@@ -228,6 +230,7 @@ const Tasks = function () {
           left="50%"
           transform="translate(-50%, -50%)"
           margin="0"
+          maxW={{ base: "calc(100% - 2rem)", sm: "400px" }}
         >
           <DialogHeader>
             <DialogTitle>Delete task</DialogTitle>
